@@ -23,6 +23,15 @@ MUSIC_DIR="deep house"
 PREVIEW_MODE=true
 FILE_TYPES="*.mp3 *.flac"
 
+# Check for apply argument
+if [[ "$1" == "apply" ]]; then
+    PREVIEW_MODE=false
+else
+    echo -e "${YELLOW}=== PREVIEW MODE ===${NC}"
+    echo -e "${YELLOW}This is a preview. No changes will be made.${NC}"
+    echo -e "${YELLOW}To apply changes, run: ${GREEN}$0 apply${NC}\n"
+fi
+
 # Function to sanitize filenames
 sanitize_filename() {
     local filename="$1"
@@ -169,16 +178,19 @@ echo -e "${RED}Errors:${NC} $errors"
 echo
 
 if [[ "$PREVIEW_MODE" == true ]]; then
-    echo -e "${GREEN}This was a preview. To actually rename the files, run:${NC}"
-    echo -e "${YELLOW}$0 apply${NC}"
+    echo -e "\n${YELLOW}=== PREVIEW COMPLETE ===${NC}"
+    echo -e "${YELLOW}This was a preview. No changes were made.${NC}"
+    echo -e "${YELLOW}To apply these changes, run: ${GREEN}$0 apply${NC}"
 else
-    echo -e "${GREEN}Renaming complete!${NC}"
+    echo -e "\n${GREEN}=== RENAMING COMPLETE ===${NC}"
+    echo -e "${GREEN}All files have been processed successfully!${NC}"
 fi
 
 # Check if we need to apply changes
 if [[ "$1" == "apply" ]]; then
     echo -e "${GREEN}Applying changes...${NC}"
+    # Don't make a recursive call, just run the script again with PREVIEW_MODE=false
     PREVIEW_MODE=false
-    # Recursive call to self with preview mode off
-    "$0"
+    # Reset the argument to prevent infinite recursion
+    set -- ""
 fi
